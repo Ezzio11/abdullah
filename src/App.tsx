@@ -43,6 +43,7 @@ export default function App() {
   const [activeTab, setActiveTab] = useState('home');
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [lang, setLang] = useState<Lang>('ar');
+  const [showAdminTab, setShowAdminTab] = useState(() => localStorage.getItem('admin_tab_visible') === 'true');
   const [isAdmin, setIsAdmin] = useState(() => {
     const p = window.location.pathname;
     const s = window.location.search;
@@ -54,7 +55,11 @@ export default function App() {
   // Check auth status periodically in case of login/logout
   useEffect(() => {
     const checkAuth = () => {
-      setIsAuth(localStorage.getItem('admin_auth') === 'true');
+      const auth = localStorage.getItem('admin_auth') === 'true';
+      setIsAuth(auth);
+      
+      const visible = localStorage.getItem('admin_tab_visible') === 'true';
+      setShowAdminTab(visible);
     };
     checkAuth();
     const interval = setInterval(checkAuth, 2000);
@@ -66,8 +71,14 @@ export default function App() {
       const p = window.location.pathname;
       const s = window.location.search;
       const h = window.location.hash;
-      setIsAdmin(p === '/admin' || s.includes('admin') || h.includes('admin'));
+      const isCurrentlyAdmin = p === '/admin' || s.includes('admin') || h.includes('admin');
+      setIsAdmin(isCurrentlyAdmin);
       
+      if (isCurrentlyAdmin) {
+        setShowAdminTab(true);
+        localStorage.setItem('admin_tab_visible', 'true');
+      }
+
       // Auto-switch to research tab if ?paper= is present
       const params = new URLSearchParams(s);
       if (params.has('paper')) {
@@ -97,7 +108,7 @@ export default function App() {
   const tabs = [
     { id: 'home', label: tr.nav.home, icon: HomeIcon },
     { id: 'research', label: tr.nav.research, icon: BookOpen },
-    { id: 'admin', label: isAuth ? tr.nav.admin : (lang === 'ar' ? 'دخول' : 'Login'), icon: UserCircle },
+    ...(showAdminTab ? [{ id: 'admin', label: isAuth ? tr.nav.admin : (lang === 'ar' ? 'دخول' : 'Login'), icon: UserCircle }] : []),
   ];
 
   const handleTabChange = (tabId: string) => {

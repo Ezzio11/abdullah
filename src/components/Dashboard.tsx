@@ -116,6 +116,7 @@ export default function Dashboard({ lang }: { lang: Lang }) {
   const handleLogout = () => {
     setIsAuthenticated(false);
     localStorage.removeItem('admin_auth');
+    localStorage.removeItem('admin_tab_visible');
   };
 
   useEffect(() => {
