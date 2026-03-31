@@ -76,7 +76,8 @@ export default function Research({ lang }: { lang: Lang }) {
       const url = new URL(window.location.href);
       if (url.searchParams.has('paper')) {
         url.searchParams.delete('paper');
-        window.history.pushState({}, '', url);
+        // Use replaceState here to avoid "ghost" history entries when closing manually
+        window.history.replaceState({}, '', url);
       }
     }
   }, [selected, isAr]);
