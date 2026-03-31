@@ -1,14 +1,18 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, Suspense, lazy } from 'react';
 import { Moon, Sun, Globe, UserCircle, BookOpen, Home as HomeIcon } from 'lucide-react';
 import Home from './components/Home';
-import Research from './components/Research';
-import Dashboard from './components/Dashboard';
 import { t, Lang } from './translations';
 import { motion, AnimatePresence } from 'motion/react';
+
+// Lazy load non-critical sections
+const Research = lazy(() => import('./components/Research'));
+const Dashboard = lazy(() => import('./components/Dashboard'));
 
 function LogoImg({ size, className = "" }: { size: number; className?: string }) {
   return (
     <motion.div
+      role="img"
+      aria-label="Abdullah Hossam Logo"
       className={`bg-[#1a2e22] dark:bg-white ${className}`}
       style={{
         width: size,
@@ -108,9 +112,17 @@ export default function App() {
   };
 
   const renderContent = () => {
-    if (isAdmin) return <Dashboard lang={lang} />;
-    if (activeTab === 'research') return <Research lang={lang} />;
-    return <Home setActiveTab={setActiveTab} lang={lang} />;
+    return (
+      <Suspense fallback={
+        <div className="flex-1 flex items-center justify-center min-h-[60vh]">
+          <div className="w-12 h-12 border-4 border-primary/20 border-t-primary rounded-full animate-spin" />
+        </div>
+      }>
+        {isAdmin ? <Dashboard lang={lang} /> : (
+          activeTab === 'research' ? <Research lang={lang} /> : <Home setActiveTab={setActiveTab} lang={lang} />
+        )}
+      </Suspense>
+    );
   };
 
   return (
@@ -144,12 +156,16 @@ export default function App() {
           </nav>
 
           <div className="flex items-center gap-1 md:gap-2">
-            <button onClick={() => setLang(l => l === 'ar' ? 'en' : 'ar')}
+            <button 
+              onClick={() => setLang(l => l === 'ar' ? 'en' : 'ar')}
+              aria-label={lang === 'ar' ? 'Switch to English' : 'تغيير اللغة إلى العربية'}
               className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-primary/10 hover:bg-primary/20 text-primary transition-all font-bold text-[12px] md:text-sm">
               <Globe size={14} className="md:w-4 md:h-4" />
               <span>{lang === 'ar' ? 'EN' : 'ع'}</span>
             </button>
-            <button onClick={() => setIsDarkMode(d => !d)}
+            <button 
+              onClick={() => setIsDarkMode(d => !d)}
+              aria-label={isDarkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
               className="p-2 rounded-xl bg-primary/10 hover:bg-primary/20 text-primary transition-all">
               {isDarkMode ? <Sun size={16} /> : <Moon size={16} />}
             </button>
