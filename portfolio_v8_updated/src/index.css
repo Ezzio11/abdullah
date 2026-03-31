@@ -1,0 +1,36 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+  --color-primary: #3da85a;
+  --color-primary-light: #a8ddb5;
+  --color-background-light: #dcfce7;
+  --color-background-dark: #1a2e22;
+  --color-card-dark: #243b2d;
+  --color-surface-dark: #243d2d;
+  
+  --font-display: "Public Sans", sans-serif;
+  --font-serif: "Playfair Display", serif;
+}
+
+/* Dark mode overrides: restore green accent in dark mode */
+.dark {
+  --color-primary: #3da85a;
+  --color-primary-light: #a8ddb5;
+}
+
+@layer utilities {
+  .scrollbar-hide::-webkit-scrollbar {
+      display: none;
+  }
+  .scrollbar-hide {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+  }
+}
+
+html, body {
+  scroll-behavior: smooth;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
