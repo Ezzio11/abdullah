@@ -40,7 +40,12 @@ export default function App() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [lang, setLang] = useState<Lang>('ar');
-  const [isAdmin, setIsAdmin] = useState(window.location.pathname === '/admin');
+  const [isAdmin, setIsAdmin] = useState(() => {
+    const p = window.location.pathname;
+    const s = window.location.search;
+    const h = window.location.hash;
+    return p === '/admin' || s.includes('admin') || h.includes('admin');
+  });
   const [isAuth, setIsAuth] = useState(localStorage.getItem('admin_auth') === 'true');
 
   // Check auth status periodically in case of login/logout
@@ -55,10 +60,13 @@ export default function App() {
 
   useEffect(() => {
     const handleLocationChange = () => {
-      setIsAdmin(window.location.pathname === '/admin');
+      const p = window.location.pathname;
+      const s = window.location.search;
+      const h = window.location.hash;
+      setIsAdmin(p === '/admin' || s.includes('admin') || h.includes('admin'));
       
       // Auto-switch to research tab if ?paper= is present
-      const params = new URLSearchParams(window.location.search);
+      const params = new URLSearchParams(s);
       if (params.has('paper')) {
         setActiveTab('research');
       }
